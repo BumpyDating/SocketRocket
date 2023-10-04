@@ -1477,10 +1477,17 @@ static const size_t SRFrameHeaderOverhead = 32;
                         // If we get closed in this state it's probably not clean because we should be sending this when we send messages
                         [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
                             if (availableMethods.didCloseWithCode) {
-                                [delegate webSocket:self
-                                   didCloseWithCode:SRStatusCodeGoingAway
-                                             reason:@"Stream end encountered"
-                                           wasClean:NO];
+                                if (self->_closeReason) {
+                                    [delegate webSocket:self
+                                       didCloseWithCode:SRStatusCodeGoingAway
+                                                 reason:self->_closeReason
+                                               wasClean:NO];
+                                } else {
+                                    [delegate webSocket:self
+                                       didCloseWithCode:SRStatusCodeGoingAway
+                                                 reason:@"Stream end encountered"
+                                               wasClean:NO];
+                                }
                             }
                         }];
                     }
